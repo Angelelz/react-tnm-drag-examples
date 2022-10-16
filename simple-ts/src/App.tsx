@@ -1,8 +1,29 @@
-import "./App.css";
+import React, { useState } from "react";
 import { useDrag } from "react-tnm-drag";
-import { useState } from "react";
+import {
+  DispatchDragObject,
+  DragElementHook,
+  DragOptionsNoContainer,
+  DragState,
+} from "react-tnm-drag/lib/types/types";
+import "./App.css";
 
-const itemList = [
+type Item = {
+  id: number;
+  name: string;
+  done: boolean;
+};
+
+interface ItemProps {
+  item: Item;
+  index: number;
+  dragState: DragState<DragOptionsNoContainer<Item>>;
+  dragDispatch: React.Dispatch<DispatchDragObject<DragOptionsNoContainer<Item>>>;
+  setArray: React.Dispatch<React.SetStateAction<Item[]>>;
+  useDragElement: DragElementHook;
+}
+
+const itemList: Item[] = [
   {
     id: 1,
     name: " 1️⃣ Create react app 🚀",
@@ -37,7 +58,9 @@ const itemList = [
 
 function App() {
   const [array, setArray] = useState(itemList);
+  
   const dragProps = useDrag({elementArray: array});
+  
   return (
     <div className="App">
       <h4>Click and hold (Or tap and hold) to start dragging</h4>
@@ -45,7 +68,7 @@ function App() {
         Container
         {array.map((item, index) => {
           return (
-            <Item
+            <ItemComponent
               item={item}
               index={index}
               {...dragProps}
@@ -59,15 +82,20 @@ function App() {
   );
 }
 
-function Item(props) {
-  const dragProps = props.useDragElement(
+function ItemComponent(props: ItemProps) {
+  
+  const dragElementProps = props.useDragElement<number, HTMLDivElement>(
     props.item.id,
     props.index,
     props.setArray
   );
+
   return (
-    <div {...dragProps} className="item">
-      <p className='text'>{props.item.name}</p>
+    <div
+      {...dragElementProps}
+      className="item"
+    >
+      <p className="text">{props.item.name}</p>
     </div>
   );
 }
